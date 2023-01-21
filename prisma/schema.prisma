@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
@@ -47,14 +47,25 @@ model Session {
   @@index([userId])
 }
 
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  companyId     String
+  role          Role      @default(EMPLOYEE)
   accounts      Account[]
   sessions      Session[]
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
 }
 
 model VerificationToken {
@@ -63,4 +74,71 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+enum Type {
+  PROVIDER
+  BUSINESS
+}
+
+model Company {
+  id          String  @id @default(cuid())
+  name        String
+  image       String?
+  address     String
+  description String
+  type        Type
+  users       User[]
+
+  companyCategories CompanyCategories[]
+  menus             Menu[]
+}
+
+model Menu {
+  id        String   @id @default(cuid())
+  name      String
+  image     String?
+  date      DateTime
+  companyId String
+
+  menuVariants MenuVariant[]
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+model MenuVariant {
+  id          String  @id @default(cuid())
+  name        String
+  description String
+  image       String?
+  menuId      String
+  price       Float
+  categoryId  String
+
+  menu     Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([menuId])
+  @@index([categoryId])
+}
+
+model CompanyCategories {
+  companyId  String
+  categoryId String @unique
+
+  company  Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([companyId, categoryId])
+  @@index([companyId, categoryId])
+}
+
+model Category {
+  id   String @id @default(cuid())
+  name String
+
+  company     CompanyCategories?
+  menuVarians MenuVariant[]
 }
