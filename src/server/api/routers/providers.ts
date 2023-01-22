@@ -20,7 +20,7 @@ export const providersRouter = createTRPCRouter({
     }),
 
   getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.company.findMany();
+    return ctx.prisma.company.findMany({ where: { type: "PROVIDER" } });
   }),
   udpateCompany: adminProviderProcedure
     .input(
