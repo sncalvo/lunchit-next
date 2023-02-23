@@ -7,9 +7,19 @@ import { prisma } from "../../../server/db";
 
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session({ session, user }) {
+    async session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
+        const prismaUser = await prisma.user.findUnique({
+          where: {
+            id: user.id,
+          },
+          include: {
+            company: true,
+          },
+        });
+        session.user.company = prismaUser?.company;
+        session.user.role = prismaUser?.role;
       }
       return session;
     },

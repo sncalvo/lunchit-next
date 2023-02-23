@@ -90,8 +90,8 @@ model Company {
   type        Type
   users       User[]
 
-  companyCategories CompanyCategories[]
-  menus             Menu[]
+  categories Category[]
+  menus      Menu[]
 }
 
 model Menu {
@@ -124,21 +124,15 @@ model MenuVariant {
   @@index([categoryId])
 }
 
-model CompanyCategories {
-  companyId  String
-  categoryId String @unique
-
-  company  Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  @@id([companyId, categoryId])
-  @@index([companyId, categoryId])
-}
-
 model Category {
   id   String @id @default(cuid())
   name String
 
-  company     CompanyCategories?
+  companyId String
+
+  company     Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   menuVarians MenuVariant[]
+
+  @@unique([name, companyId])
+  @@index([companyId])
 }

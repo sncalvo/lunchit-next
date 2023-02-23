@@ -6,6 +6,8 @@ import {
   adminProviderProcedure,
 } from "../trpc";
 
+import { createSchema, updateSchema } from "../../../schemas/menu";
+
 export const menusRouter = createTRPCRouter({
   get: publicProcedure
     .input(z.object({ menuId: z.string() }))
@@ -25,46 +27,15 @@ export const menusRouter = createTRPCRouter({
         },
       });
     }),
-  udpateMenu: adminProviderProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        date: z.date(),
-        menuVariants: z.object({
-          createMany: z.object({
-            data: z.array(
-              z.object({
-                name: z.string(),
-                description: z.string(),
-                price: z.number(),
-                categoryId: z.string(),
-              })
-            ),
-          }),
-          updateMany: z.array(
-            z.object({
-              where: z.object({
-                id: z.string(),
-              }),
-              data: z.array(
-                z.object({
-                  name: z.string(),
-                  description: z.string(),
-                  price: z.number(),
-                  categoryId: z.string(),
-                })
-              ),
-            })
-          ),
-          deleteMany: z.array(
-            z.object({
-              id: z.string(),
-            })
-          ),
-        }),
-      })
-    )
+  create: adminProviderProcedure
+    .input(createSchema)
+    .mutation(({ input, ctx }) => {
+      return ctx.prisma.menu.create({
+        data: { ...input, companyId: ctx.session.user.companyId },
+      });
+    }),
+  update: adminProviderProcedure
+    .input(updateSchema)
     .mutation(({ input, ctx }) => {
       return ctx.prisma.menu.update({
         where: { id: input.id },

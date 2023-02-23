@@ -2,7 +2,7 @@ import clsx from "clsx";
 
 type ButtonProps = Pick<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
-  "onClick" | "id"
+  "onClick" | "id" | "type"
 > & {
   children: React.ReactNode;
   variant?:
@@ -33,21 +33,45 @@ const Button: React.FC<ButtonProps> = ({
   circle = false,
   spacing,
   loading = false,
+  type = "button",
   ...props
 }) => (
   <button
     className={clsx(
       "btn",
-      `btn-${variant}`,
-      `btn-${size}`,
+      {
+        "btn-primary": variant === "primary",
+        "btn-secondary": variant === "secondary",
+        "btn-tertiary": variant === "tertiary",
+        "btn-info": variant === "info",
+        "btn-success": variant === "success",
+        "btn-warning": variant === "warning",
+        "btn-error": variant === "error",
+        "btn-glass": variant === "glass",
+        "btn-ghost": variant === "ghost",
+      },
+      {
+        "btn-sm": size === "sm",
+        "btn-md": size === "md",
+        "btn-xs": size === "xs",
+        "btn-wide": size === "wide",
+        "btn-block": size === "block",
+      },
       { "btn-outline": outline },
       { "btn-circle": circle },
       { "btn-disabled": disabled },
       { "btn-loading": loading },
-      spacing !== undefined && `gap-${spacing}`
+      spacing !== undefined && {
+        "gap-0": spacing === 0,
+        "gap-1": spacing === 1,
+        "gap-2": spacing === 2,
+        "gap-3": spacing === 3,
+        "gap-4": spacing === 4,
+      }
     )}
     disabled={disabled}
     id={id}
+    type={type}
     {...props}
   >
     {children}
