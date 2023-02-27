@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type * as z from "zod";
 
-import type { FieldValues } from "react-hook-form";
+import type { DeepPartial, FieldValues } from "react-hook-form";
 import type { BaseSyntheticEvent } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 
@@ -11,16 +11,23 @@ type Props<T> = {
   onSubmit: (data: T) => void;
   schema: z.ZodSchema<T>;
   children: React.ReactNode;
+  defaultValues?: DeepPartial<T> | ((payload?: unknown) => Promise<T>);
 };
 
-function Form<T extends FieldValues>({ onSubmit, schema, children }: Props<T>) {
+function Form<T extends FieldValues>({
+  onSubmit,
+  schema,
+  children,
+  defaultValues,
+}: Props<T>) {
   const resolver = zodResolver(schema);
 
   const methods = useForm<T>({
     resolver,
+    defaultValues,
   });
 
-  console.log(methods.formState.errors);
+  console.log({ errors: methods.formState.errors });
 
   return (
     <FormProvider {...methods}>

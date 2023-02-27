@@ -11,7 +11,7 @@ type Props = {
 const MenuCard: React.FC<Props> = ({ menu }) => {
   if (!menu) {
     return (
-      <div className="card w-80 bg-base-100 shadow-xl">
+      <div className="card bg-base-100 shadow-xl">
         <figure>
           <div className="h-[300px] w-full animate-pulse bg-base-200"></div>
         </figure>
@@ -28,7 +28,7 @@ const MenuCard: React.FC<Props> = ({ menu }) => {
   }
 
   return (
-    <div className="card w-80 bg-base-100 shadow-xl">
+    <div className="card w-full bg-base-100 shadow-xl">
       <figure>
         <Image
           src={menu.image || FoodDefault}

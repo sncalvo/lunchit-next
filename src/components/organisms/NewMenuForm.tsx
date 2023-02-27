@@ -8,12 +8,16 @@ import FormInput from "../molecules/FormInput";
 import MenuVariantsFormFields from "./MenuVariantsFormFields";
 import { useState } from "react";
 import NewCategoryModal from "./NewCategoryModal";
+import { useRouter } from "next/router";
 
-const MenuForm: React.FC = () => {
+const NewMenuForm: React.FC = () => {
   const utils = api.useContext();
+  const router = useRouter();
   const { mutate, isLoading } = api.menus.create.useMutation({
     onSuccess: async () => {
       await utils.menus.invalidate();
+
+      await router.replace("/providers/menus");
     },
   });
 
@@ -57,4 +61,4 @@ const MenuForm: React.FC = () => {
   );
 };
 
-export default MenuForm;
+export default NewMenuForm;

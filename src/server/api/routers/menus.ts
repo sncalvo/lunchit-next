@@ -16,14 +16,30 @@ export const menusRouter = createTRPCRouter({
         where: {
           id: input.menuId,
         },
+        include: {
+          menuVariants: true,
+        },
       });
     }),
   getAll: publicProcedure
-    .input(z.object({ companyId: z.string() }))
-    .query(({ ctx, input }) => {
+    .input(z.object({ companyId: z.string().optional() }))
+    .query(async ({ ctx, input }) => {
+      let companyId = input.companyId;
+
+      if (ctx.session && ctx.session.user) {
+        const user = await ctx.prisma.user.findUnique({
+          where: { id: ctx.session.user.id },
+          include: { company: true },
+        });
+
+        if (user && user.company.type === "PROVIDER") {
+          companyId ||= user.companyId;
+        }
+      }
+
       return ctx.prisma.menu.findMany({
         where: {
-          companyId: input.companyId,
+          companyId,
         },
       });
     }),

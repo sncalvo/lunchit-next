@@ -85,33 +85,35 @@ function MenuVariantsFormFields() {
 
       <ol>
         {updateFields.map((field, index) => (
-          <li key={field.id}>
+          <li key={field.id} className="grid grid-cols-2 items-end gap-2 p-2">
             <FormInput
               label="name"
-              name={`menuVariants.updateMany.${index}.name`}
+              name={`menuVariants.updateMany.${index}.data.name`}
               type="text"
             />
             <FormInput
               label="description"
-              name={`menuVariants.updateMany.${index}.description`}
+              name={`menuVariants.updateMany.${index}.data.description`}
               type="text"
             />
             <FormInput
               label="price"
-              name={`menuVariants.updateMany.${index}.price`}
+              name={`menuVariants.updateMany.${index}.data.price`}
               type="number"
             />
-            {!categoriesLoading && categories !== undefined && (
-              <FormSelect
-                label="category"
-                name={`menuVariants.createMany.data.${index}.categoryId`}
-                options={categories.map((category) => ({
-                  value: category.id,
-                  label: category.name,
-                }))}
-              />
-            )}
-            <button
+            {!categoriesLoading &&
+              categories !== undefined &&
+              categories.length > 0 && (
+                <FormSelect
+                  label="category"
+                  name={`menuVariants.updateMany.${index}.data.categoryId`}
+                  options={categories.map((category) => ({
+                    value: category.id,
+                    label: category.name,
+                  }))}
+                />
+              )}
+            <Button
               type="button"
               onClick={() => {
                 removeUpdate(index);
@@ -123,9 +125,10 @@ function MenuVariantsFormFields() {
                 );
                 appendDelete({ id, name });
               }}
+              variant="warning"
             >
               Remove
-            </button>
+            </Button>
           </li>
         ))}
       </ol>

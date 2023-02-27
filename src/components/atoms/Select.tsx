@@ -40,8 +40,9 @@ function NestedSelect<T extends FieldValues>({
       className={clsx("select-bordered select-info select", {
         "input-error": error && isDirty,
       })}
+      defaultValue="default"
     >
-      <option disabled selected>
+      <option disabled value="default">
         {label}
       </option>
       {options.map((option) => (

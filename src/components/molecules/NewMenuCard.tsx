@@ -7,8 +7,8 @@ const NewMenuCard: React.FC = () => {
     <Link href="/providers/menus/new">
       <div
         className={clsx(
-          "card flex w-80 items-center justify-center bg-base-100 text-center",
-          "shadow-xl transition-all hover:bg-base-200"
+          "card flex w-full items-center justify-center bg-base-100 text-center",
+          "h-full shadow-xl transition-all hover:bg-base-200"
         )}
       >
         <PlusCircleIcon className="text-primary-500 h-24 w-24" />
