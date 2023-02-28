@@ -3,12 +3,15 @@ import type { Menu } from "@prisma/client";
 
 import FoodDefault from "../../../public/images/food-default.webp";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 type Props = {
   menu?: Menu;
 };
 
 const MenuCard: React.FC<Props> = ({ menu }) => {
+  const session = useSession();
+
   if (!menu) {
     return (
       <div className="card bg-base-100 shadow-xl">
@@ -42,7 +45,15 @@ const MenuCard: React.FC<Props> = ({ menu }) => {
         <h2 className="card-title">{menu.name}</h2>
         <p>{menu.date.toLocaleDateString()}</p>
         <div className="card-actions justify-end">
-          <Link href={`/providers/menus/${menu.id}/edit`}>Edit</Link>
+          <Link
+            href={
+              session.data?.user?.company?.type === "PROVIDER"
+                ? `/providers/menus/${menu.id}/edit`
+                : `/providers/menus/${menu.id}`
+            }
+          >
+            Edit
+          </Link>
         </div>
       </div>
     </div>

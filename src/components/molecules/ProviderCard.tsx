@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { Company } from "@prisma/client";
 
 import FoodDefault from "../../../public/images/food-default.webp";
+import Link from "next/link";
 
 type Props = {
   provider?: Company;
@@ -41,7 +42,9 @@ const ProviderCard: React.FC<Props> = ({ provider }) => {
         <h2 className="card-title">{provider.name}</h2>
         <p>{provider.description}</p>
         <div className="card-actions justify-end">
-          <button className="btn-primary btn">View Now</button>
+          <Link href={`/providers/${provider.id}`}>
+            <button className="btn-primary btn">View</button>
+          </Link>
         </div>
       </div>
     </div>

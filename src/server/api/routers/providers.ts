@@ -16,6 +16,18 @@ export const providersRouter = createTRPCRouter({
           id: input.id,
           type: "PROVIDER",
         },
+        include: {
+          menus: {
+            where: {
+              date: {
+                gte: new Date(),
+              },
+            },
+            include: {
+              menuVariants: true,
+            },
+          },
+        },
       });
     }),
 
