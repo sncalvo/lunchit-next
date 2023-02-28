@@ -48,9 +48,12 @@ const Purchase: NextPage = () => {
           Aquí puedes ocultar loadings de su sitio, por ejemplo.
         */
         },
-        onSubmit: (cardFormData: unknown) => {
+        onSubmit: async (cardFormData: unknown) => {
           const paymentData = paymentSchema.parse(cardFormData);
-          return paymentMutation.mutateAsync(paymentData);
+
+          await paymentMutation.mutateAsync(paymentData);
+
+          await router.replace("/");
         },
         onError: (error: any) => {
           // callback llamado para todos los casos de error de Brick
@@ -67,14 +70,18 @@ const Purchase: NextPage = () => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col gap-5 p-5">
       {isLoading ? (
         <div>Loading...</div>
       ) : (
-        <div>
-          <h1>{menuVariant?.name}</h1>
-          <h2>{menuVariant?.price}</h2>
-          <p>{menuVariant?.description}</p>
+        <div className="card bg-base-100">
+          <div className="card-body">
+            <div className="card-title">
+              <h1>{menuVariant?.name}</h1>
+            </div>
+            <h2>{menuVariant?.price}</h2>
+            <p>{menuVariant?.description}</p>
+          </div>
         </div>
       )}
       <Script
