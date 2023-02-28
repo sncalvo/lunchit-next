@@ -26,7 +26,7 @@ const Purchase: NextPage = () => {
 
   const paymentMutation = api.payments.pay.useMutation();
 
-  const renderCardPaymentBrick = async (bricksBuilder) => {
+  const renderCardPaymentBrick = async (bricksBuilder: any) => {
     const settings = {
       initialization: {
         amount: menuVariant?.price ?? 100,
@@ -52,13 +52,14 @@ const Purchase: NextPage = () => {
           const paymentData = paymentSchema.parse(cardFormData);
           return paymentMutation.mutateAsync(paymentData);
         },
-        onError: (error) => {
+        onError: (error: any) => {
           // callback llamado para todos los casos de error de Brick
           console.error(error);
         },
       },
     };
-    window.cardPaymentBrickController = await bricksBuilder.create(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    (window as any).cardPaymentBrickController = await bricksBuilder.create(
       "cardPayment",
       "cardPaymentBrick_container",
       settings
@@ -79,10 +80,14 @@ const Purchase: NextPage = () => {
       <Script
         src="https://sdk.mercadopago.com/js/v2"
         onLoad={() => {
-          const mp = new MercadoPago(clientEnv.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC);
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+          const mp = new MercadoPago(
+            clientEnv.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC
+          ) as unknown as any;
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
           const bricksBuilder = mp.bricks();
 
-          renderCardPaymentBrick(bricksBuilder);
+          void renderCardPaymentBrick(bricksBuilder);
         }}
       />
       <div id="cardPaymentBrick_container"></div>
