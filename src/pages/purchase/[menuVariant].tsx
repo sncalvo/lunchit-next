@@ -6,7 +6,6 @@ import paymentSchema from "../../schemas/payment";
 import { api } from "../../utils/api";
 import { checkLoggedIn } from "../../utils/checkAuthentication";
 
-// In server side props, check user logged in to allow access to this page
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const checkAuthentication = await checkLoggedIn(context);
 
@@ -26,7 +25,7 @@ const Purchase: NextPage = () => {
 
   const paymentMutation = api.payments.pay.useMutation();
 
-  const renderCardPaymentBrick = async (bricksBuilder: any) => {
+  const renderCardPaymentBrick = async (bricksBuilder: BrickBuilder) => {
     const settings = {
       initialization: {
         amount: menuVariant?.price ?? 100,
@@ -43,10 +42,7 @@ const Purchase: NextPage = () => {
       },
       callbacks: {
         onReady: () => {
-          /*
-          Callback llamado cuando Brick esté listo.
-          Aquí puedes ocultar loadings de su sitio, por ejemplo.
-        */
+          /* Use to initialize UI when brick is loaded */
         },
         onSubmit: async (cardFormData: unknown) => {
           const paymentData = paymentSchema.parse(cardFormData);
@@ -55,14 +51,13 @@ const Purchase: NextPage = () => {
 
           await router.replace("/");
         },
-        onError: (error: any) => {
-          // callback llamado para todos los casos de error de Brick
+        onError: (error: unknown) => {
           console.error(error);
         },
       },
     };
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    (window as any).cardPaymentBrickController = await bricksBuilder.create(
+
+    await bricksBuilder.create(
       "cardPayment",
       "cardPaymentBrick_container",
       settings
@@ -87,11 +82,7 @@ const Purchase: NextPage = () => {
       <Script
         src="https://sdk.mercadopago.com/js/v2"
         onLoad={() => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-          const mp = new MercadoPago(
-            clientEnv.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC
-          ) as unknown as any;
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          const mp = new MercadoPago(clientEnv.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC);
           const bricksBuilder = mp.bricks();
 
           void renderCardPaymentBrick(bricksBuilder);
