@@ -9,6 +9,7 @@ const paymentSchema = z.object({
   payer: z.object({
     email: z.string(),
   }),
+  menuVariantId: z.string(),
 });
 
 export default paymentSchema;

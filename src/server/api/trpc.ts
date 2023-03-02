@@ -15,6 +15,8 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   };
 };
 
+export type TRPCContext = ReturnType<typeof createInnerTRPCContext>;
+
 export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   const { req, res } = opts;
 
@@ -52,10 +54,7 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
-const getUser = async (
-  ctx: ReturnType<typeof createInnerTRPCContext>,
-  withCompany: boolean
-) => {
+const getUser = async (ctx: TRPCContext, withCompany: boolean) => {
   if (!ctx.session || !ctx.session.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }

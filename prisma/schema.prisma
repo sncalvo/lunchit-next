@@ -62,6 +62,7 @@ model User {
   role          Role      @default(EMPLOYEE)
   accounts      Account[]
   sessions      Session[]
+  orders        Order[]
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
@@ -120,6 +121,8 @@ model MenuVariant {
   menu     Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
   category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
+  orders Order[]
+
   @@index([menuId])
   @@index([categoryId])
 }
@@ -135,4 +138,25 @@ model Category {
 
   @@unique([name, companyId])
   @@index([companyId])
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  orderId       String?
+  date          DateTime    @default(now())
+  status        OrderStatus @default(PENDING)
+  userId        String
+  menuVariantId String
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  menuVariant MenuVariant @relation(fields: [menuVariantId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([menuVariantId])
 }

@@ -1,11 +1,9 @@
 type BrickCreationOptions = {
   initialization: {
     amount: number;
+    email?: string | null;
   };
-  payer: {
-    email: string;
-  };
-  customization: {
+  customization?: {
     visual: {
       style: {
         theme: string;

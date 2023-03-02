@@ -24,6 +24,10 @@ export const serverSchema = z.object({
   AUTH0_ISSUER: z.string(),
   MERCADO_PAGO_PUBLIC: z.string(),
   MERCADO_PAGO_ACCESS_TOKEN: z.string(),
+  MAIL_SERVER: z.string(),
+  MAIL_PORT: z.string(),
+  MAIL_USER: z.string(),
+  MAIL_PASS: z.string(),
 });
 
 /**
@@ -41,6 +45,10 @@ export const serverEnv = {
   AUTH0_ISSUER: process.env.AUTH0_ISSUER,
   MERCADO_PAGO_PUBLIC: process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC,
   MERCADO_PAGO_ACCESS_TOKEN: process.env.MERCADO_PAGO_ACCESS_TOKEN,
+  MAIL_SERVER: process.env.MAIL_SERVER,
+  MAIL_PORT: process.env.MAIL_PORT,
+  MAIL_USER: process.env.MAIL_USER,
+  MAIL_PASS: process.env.MAIL_PASS,
 };
 /**
  * Specify your client-side environment variables schema here.

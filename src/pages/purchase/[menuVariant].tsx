@@ -1,19 +1,34 @@
-import type { GetServerSideProps, NextPage } from "next";
+import type {
+  GetServerSideProps,
+  InferGetServerSidePropsType,
+  NextPage,
+} from "next";
+import type { Session } from "next-auth";
 import { useRouter } from "next/router";
 import Script from "next/script";
+import { useState } from "react";
+import PurchaseResultModal from "../../components/molecules/PaymentResultModal";
 import { clientEnv } from "../../env/schema.mjs";
 import paymentSchema from "../../schemas/payment";
 import { api } from "../../utils/api";
 import { checkLoggedIn } from "../../utils/checkAuthentication";
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+type User = Required<Pick<Session, "user">>;
+
+export const getServerSideProps: GetServerSideProps<User> = async (context) => {
   const checkAuthentication = await checkLoggedIn(context);
 
   return checkAuthentication;
 };
 
-const Purchase: NextPage = () => {
+type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
+
+const Purchase: NextPage<Props> = ({ user }) => {
   const router = useRouter();
+
+  const [paymentDone, setPaymentDone] = useState(false);
+  const [paymentError, setPaymentError] = useState(false);
+
   const { menuVariant: menuVariantId } = router.query;
 
   const { data: menuVariant, isLoading } = api.menuVariants.get.useQuery(
@@ -23,33 +38,43 @@ const Purchase: NextPage = () => {
     { enabled: menuVariantId !== undefined }
   );
 
+  const [loadingMercadoPago, setLoadingMercadoPago] = useState(true);
+
   const paymentMutation = api.payments.pay.useMutation();
 
   const renderCardPaymentBrick = async (bricksBuilder: BrickBuilder) => {
     const settings = {
       initialization: {
         amount: menuVariant?.price ?? 100,
-      },
-      payer: {
-        email: "test@mail.com",
-      },
-      customization: {
-        visual: {
-          style: {
-            theme: "default",
-          },
+        payer: {
+          email: user.email,
         },
       },
       callbacks: {
         onReady: () => {
-          /* Use to initialize UI when brick is loaded */
+          setLoadingMercadoPago(false);
         },
         onSubmit: async (cardFormData: unknown) => {
-          const paymentData = paymentSchema.parse(cardFormData);
+          console.log(menuVariant);
+          if (!menuVariant?.id) {
+            return;
+          }
 
-          await paymentMutation.mutateAsync(paymentData);
+          console.log("Parsing payment data", cardFormData);
 
-          await router.replace("/");
+          const paymentData = paymentSchema
+            .omit({ menuVariantId: true })
+            .parse(cardFormData);
+
+          const response = await paymentMutation.mutateAsync({
+            ...paymentData,
+            menuVariantId: menuVariant.id,
+          });
+
+          setPaymentDone(true);
+          if (response.status !== "approved") {
+            setPaymentError(true);
+          }
         },
         onError: (error: unknown) => {
           console.error(error);
@@ -66,7 +91,7 @@ const Purchase: NextPage = () => {
 
   return (
     <div className="flex flex-col gap-5 p-5">
-      {isLoading ? (
+      {isLoading || loadingMercadoPago ? (
         <div>Loading...</div>
       ) : (
         <div className="card bg-base-100">
@@ -89,6 +114,14 @@ const Purchase: NextPage = () => {
         }}
       />
       <div id="cardPaymentBrick_container"></div>
+
+      <PurchaseResultModal
+        open={paymentDone}
+        error={paymentError}
+        onClose={() => {
+          void router.replace("/");
+        }}
+      />
     </div>
   );
 };

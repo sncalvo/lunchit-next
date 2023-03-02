@@ -17,7 +17,9 @@ async function checkLoggedIn(ctx: {
   }
 
   return {
-    props: {},
+    props: {
+      user: session.user,
+    },
   };
 }
 
