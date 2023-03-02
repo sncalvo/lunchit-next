@@ -16,6 +16,8 @@ function NewCategoryModal({ open = false, setNewCategoryModalOpen }: Props) {
   const { mutate, isLoading } = api.categories.create.useMutation({
     onSuccess: async () => {
       await utils.categories.invalidate();
+
+      setNewCategoryModalOpen?.(false);
     },
   });
 
