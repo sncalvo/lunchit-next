@@ -44,6 +44,7 @@ type InputProp = {
   type: HTMLInputTypeAttribute;
 };
 
+// TODO: add memo
 function Input({ name, type }: InputProp) {
   const methods = useFormContext();
 

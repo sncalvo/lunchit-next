@@ -55,12 +55,9 @@ const Purchase: NextPage<Props> = ({ user }) => {
           setLoadingMercadoPago(false);
         },
         onSubmit: async (cardFormData: unknown) => {
-          console.log(menuVariant);
           if (!menuVariant?.id) {
             return;
           }
-
-          console.log("Parsing payment data", cardFormData);
 
           const paymentData = paymentSchema
             .omit({ menuVariantId: true })

@@ -7,7 +7,7 @@ export function sendMail(mailOptions: Mail.Options) {
   const transporter = nodemailer.createTransport({
     port: parseInt(env.MAIL_PORT),
     host: env.MAIL_SERVER,
-    secure: true,
+    secure: env.MAIL_SECURE,
     auth: {
       user: env.MAIL_USER,
       pass: env.MAIL_PASS,

@@ -28,6 +28,8 @@ export const serverSchema = z.object({
   MAIL_PORT: z.string(),
   MAIL_USER: z.string(),
   MAIL_PASS: z.string(),
+  EMAIL_FROM: z.string(),
+  MAIL_SECURE: z.boolean(),
 });
 
 /**
@@ -49,6 +51,8 @@ export const serverEnv = {
   MAIL_PORT: process.env.MAIL_PORT,
   MAIL_USER: process.env.MAIL_USER,
   MAIL_PASS: process.env.MAIL_PASS,
+  EMAIL_FROM: process.env.EMAIL_FROM,
+  MAIL_SECURE: process.env.MAIL_SECURE === "true",
 };
 /**
  * Specify your client-side environment variables schema here.

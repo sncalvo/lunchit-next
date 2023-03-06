@@ -66,7 +66,7 @@ const UpdateMenuForm: React.FC = () => {
           <div className="card-body">
             <h2>Update menu {menuDefaultValues.name}</h2>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 md:flex-row">
               <div>
                 <FormInput name="name" label="name" type="text" />
 
