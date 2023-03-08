@@ -27,6 +27,8 @@ function Form<T extends FieldValues>({
     defaultValues,
   });
 
+  console.log(methods.formState.errors);
+
   return (
     <FormProvider {...methods}>
       <form

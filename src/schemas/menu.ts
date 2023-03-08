@@ -5,6 +5,7 @@ const menuVariantSchema = z.object({
   description: z.string().min(0).max(255),
   price: z.coerce.number(),
   categoryId: z.string().min(1).max(255),
+  image: z.string().optional().nullable(),
 });
 
 const menuSchema = z.object({
@@ -47,4 +48,54 @@ const createSchema = menuSchema.omit({ id: true }).extend({
   menuVariants: menuVariantCreationSchema,
 });
 
-export { createSchema, updateSchema };
+const updateFormSchema = updateSchema.merge(
+  z.object({
+    menuVariants: z.object({
+      ...updateSchema.shape.menuVariants.shape,
+      createMany: z.object({
+        ...updateSchema.shape.menuVariants.shape.createMany.shape,
+        data: z.array(
+          z.object({
+            ...updateSchema.shape.menuVariants.shape.createMany.shape.data
+              .element.shape,
+            image: z.any().refine((file) => file instanceof File, {
+              message: "Must be a file",
+            }),
+          })
+        ),
+      }),
+      updateMany: z.array(
+        z.object({
+          where: z.object({
+            id: z.string(),
+          }),
+          data: z.object({
+            ...updateSchema.shape.menuVariants.shape.updateMany.element.shape
+              .data.shape,
+            image: z.any().optional(),
+          }),
+        })
+      ),
+    }),
+  })
+);
+
+const createFormSchema = createSchema.merge(
+  z.object({
+    menuVariants: z.object({
+      createMany: z.object({
+        data: z.array(
+          z.object({
+            ...createSchema.shape.menuVariants.shape.createMany.shape.data
+              .element.shape,
+            image: z.any().refine((file) => file instanceof File, {
+              message: "Must be a file",
+            }),
+          })
+        ),
+      }),
+    }),
+  })
+);
+
+export { createSchema, updateSchema, updateFormSchema, createFormSchema };

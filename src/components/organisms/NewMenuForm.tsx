@@ -1,4 +1,4 @@
-import { createSchema } from "../../schemas/menu";
+import { createFormSchema, createSchema } from "../../schemas/menu";
 import Button from "../atoms/Button";
 import Form from "../atoms/Form";
 
@@ -9,25 +9,8 @@ import MenuVariantsFormFields from "./MenuVariantsFormFields";
 import { useState } from "react";
 import NewCategoryModal from "./NewCategoryModal";
 import { useRouter } from "next/router";
-import * as z from "zod";
-
-const formSchema = createSchema.merge(
-  z.object({
-    menuVariants: z.object({
-      createMany: z.object({
-        data: z.array(
-          z.object({
-            image: z.any().refine((file) => file instanceof File, {
-              message: "Must be a file",
-            }),
-            ...createSchema.shape.menuVariants.shape.createMany.shape.data
-              .element.shape,
-          })
-        ),
-      }),
-    }),
-  })
-);
+import type * as z from "zod";
+import useUploadImage from "../../utils/useUploadImage";
 
 const NewMenuForm: React.FC = () => {
   const utils = api.useContext();
@@ -39,20 +22,23 @@ const NewMenuForm: React.FC = () => {
       await router.replace("/providers/menus");
     },
   });
+  const { mutateAsync: imageMutation } =
+    api.image.createPresignedURL.useMutation();
+  const uploadImage = useUploadImage(imageMutation);
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log(data);
+  const onSubmit = async (data: z.infer<typeof createFormSchema>) => {
+    const imagesUploads = data.menuVariants.createMany.data.map(uploadImage);
 
-    // Upload images to s3
+    await Promise.all(imagesUploads);
 
-    // mutate(createSchema.parse(data));
+    mutate(createSchema.parse(data));
   };
 
   const [newCategoryModalOpen, setNewCategoryModalOpen] = useState(false);
 
   return (
     <>
-      <Form onSubmit={onSubmit} schema={formSchema}>
+      <Form onSubmit={(data) => void onSubmit(data)} schema={createFormSchema}>
         <div className="card bg-base-100 shadow-xl">
           <div className="card-body">
             <h2>Create a new menu</h2>

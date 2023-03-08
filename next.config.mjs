@@ -14,6 +14,9 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  images: {
+    domains: [process.env.PUBLIC_IMAGE_DOMAIN || ""],
+  },
   async redirects() {
     return [
       {

@@ -1,4 +1,6 @@
-import { updateSchema } from "../../schemas/menu";
+import { useMemo, useState } from "react";
+
+import { updateFormSchema, updateSchema } from "../../schemas/menu";
 import Button from "../atoms/Button";
 import Form from "../atoms/Form";
 
@@ -6,9 +8,11 @@ import { api } from "../../utils/api";
 
 import FormInput from "../molecules/FormInput";
 import MenuVariantsFormFields from "./MenuVariantsFormFields";
-import { useMemo, useState } from "react";
 import NewCategoryModal from "./NewCategoryModal";
 import { useRouter } from "next/router";
+import useUploadImage from "../../utils/useUploadImage";
+
+import type * as z from "zod";
 
 const UpdateMenuForm: React.FC = () => {
   const utils = api.useContext();
@@ -24,6 +28,9 @@ const UpdateMenuForm: React.FC = () => {
       await router.replace("/providers/menus");
     },
   });
+  const { mutateAsync: imageMutation } =
+    api.image.createPresignedURL.useMutation();
+  const uploadImage = useUploadImage(imageMutation);
 
   const menuDefaultValues = useMemo(() => {
     if (!menu) return undefined;
@@ -53,13 +60,27 @@ const UpdateMenuForm: React.FC = () => {
 
   const [newCategoryModalOpen, setNewCategoryModalOpen] = useState(false);
 
+  const onSubmit = async (data: z.infer<typeof updateFormSchema>) => {
+    const imagesUploads = data.menuVariants.createMany.data
+      .map(uploadImage)
+      .concat(
+        data.menuVariants.updateMany.map(
+          async (menuVariant) => await uploadImage(menuVariant.data)
+        )
+      );
+
+    await Promise.all(imagesUploads);
+
+    mutate(updateSchema.parse(data));
+  };
+
   if (!menuDefaultValues) return null;
 
   return (
     <>
       <Form
-        onSubmit={mutate}
-        schema={updateSchema}
+        onSubmit={(data) => void onSubmit(data)}
+        schema={updateFormSchema}
         defaultValues={menuDefaultValues}
       >
         <div className="card bg-base-100 shadow-xl">

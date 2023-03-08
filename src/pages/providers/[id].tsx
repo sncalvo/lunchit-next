@@ -42,9 +42,9 @@ const ShowProvider: NextPage = () => {
           <p>{provider.description}</p>
         </div>
       </div>
-      <div>
+      <div className="mt-5">
         <h1 className="text-xl">Menus</h1>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {provider.menus.map((menu) => (
             <div key={menu.id} className="card bg-base-100 shadow-xl">
               <div className="card-body">
@@ -56,9 +56,20 @@ const ShowProvider: NextPage = () => {
                 <div>
                   {menu.menuVariants.map((menuVariant) => (
                     <>
-                      <div className="grid grid-cols-7" key={menuVariant.id}>
-                        <h3 className="col-span-2">{menuVariant.name}</h3>
-                        <p className="col-span-3">{menuVariant.description}</p>
+                      <div
+                        className="grid h-16 grid-cols-8 gap-4"
+                        key={menuVariant.id}
+                      >
+                        <div className="relative col-span-1 overflow-hidden">
+                          <Image
+                            src={menuVariant.image || FoodDefault}
+                            alt={menuVariant.name}
+                            fill
+                            className="rounded object-cover"
+                          />
+                        </div>
+                        <h3 className="col-span-3">{menuVariant.name}</h3>
+                        <p className="col-span-2">{menuVariant.description}</p>
                         <p className="col-span-1">{menuVariant.price}</p>
 
                         <div className="col-span-1">
@@ -68,7 +79,10 @@ const ShowProvider: NextPage = () => {
                         </div>
                       </div>
 
-                      <div className="my-2 h-px bg-base-300"></div>
+                      <div
+                        className="my-2 h-px bg-base-300"
+                        key={`${menuVariant.id}_separator`}
+                      ></div>
                     </>
                   ))}
                 </div>
