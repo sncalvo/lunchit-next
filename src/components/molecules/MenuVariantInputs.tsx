@@ -14,7 +14,7 @@ function MenuVariantInputs({ name, onRemove }: Props) {
     api.categories.getAll.useQuery();
 
   return (
-    <li className="grid grid-cols-1  items-end gap-2 p-2 md:grid-cols-2">
+    <li className="grid grid-cols-1 items-end gap-2 p-2 md:grid-cols-2">
       <FormInput label="name" name={`${name}.name`} type="text" />
       <FormInput label="description" name={`${name}.description`} type="text" />
       <FormInput label="price" name={`${name}.price`} type="number" />
