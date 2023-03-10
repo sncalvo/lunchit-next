@@ -13,7 +13,6 @@ export const imageRouter = createTRPCRouter({
   createPresignedURL: protectedProcedure
     .input(schema)
     .mutation(async ({ input }) => {
-      console.log("input", input);
       const s3 = new S3({
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -25,7 +24,6 @@ export const imageRouter = createTRPCRouter({
       const fields = {
         Key: `${input.key}/${UUID}`,
       };
-      console.log("fields", fields);
 
       // const url = await s3.getSignedUrlPromise("putObject", {
       //   Bucket: process.env.NODE_ENV,
@@ -48,8 +46,6 @@ export const imageRouter = createTRPCRouter({
           }
         )
       );
-
-      console.log("url", url);
 
       return { url, fields: { key: fields.Key } };
     }),

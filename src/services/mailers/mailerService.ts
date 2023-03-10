@@ -16,9 +16,9 @@ export function sendMail(mailOptions: Mail.Options) {
 
   return transporter.sendMail(mailOptions, (error: unknown, info: unknown) => {
     if (error) {
-      console.log(error);
+      console.error(error);
     } else {
-      console.log(info);
+      console.info(info);
     }
   });
 }

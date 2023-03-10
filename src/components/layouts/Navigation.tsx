@@ -16,14 +16,16 @@ const NavigationLayout: React.FC<Props> = ({ children }) => {
     // TODO: Use to determine editing orders and company info
     // const role = session.data?.user?.role;
 
+    const common = [
+      { href: "/users", label: "Users" },
+      { href: "/", label: "Home" },
+    ];
+
     if (company?.type === "PROVIDER") {
-      return [
-        { href: "/", label: "Home" },
-        { href: "/providers/menus", label: "Menus" },
-      ];
+      return [...common, { href: "/providers/menus", label: "Menus" }];
     }
 
-    return [{ href: "/", label: "Home" }];
+    return [...common];
   }, [session.data?.user?.company]);
 
   return (

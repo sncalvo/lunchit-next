@@ -12,7 +12,7 @@ const getBaseUrl = () => {
 };
 
 export const api = createTRPCNext<AppRouter>({
-  config() {
+  config({ ctx }) {
     return {
       transformer: superjson,
       /**
@@ -27,6 +27,17 @@ export const api = createTRPCNext<AppRouter>({
         }),
         httpBatchLink({
           url: `${getBaseUrl()}/api/trpc`,
+          headers: () => {
+            if (ctx?.req) {
+              const headers = ctx?.req?.headers;
+              delete headers?.connection;
+              return {
+                ...headers,
+                "x-ssr": "1",
+              };
+            }
+            return {};
+          },
         }),
       ],
       queryClientConfig: {

@@ -20,7 +20,6 @@ export type TRPCContext = ReturnType<typeof createInnerTRPCContext>;
 export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   const { req, res } = opts;
 
-  // Get the session from the server using the unstable_getServerSession wrapper function
   const session = await getServerAuthSession({ req, res });
 
   return createInnerTRPCContext({
@@ -42,18 +41,6 @@ export const createTRPCRouter = t.router;
 
 export const publicProcedure = t.procedure;
 
-const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
-  }
-  return next({
-    ctx: {
-      // infers the `session` as non-nullable
-      session: { ...ctx.session, user: ctx.session.user },
-    },
-  });
-});
-
 const getUser = async (ctx: TRPCContext, withCompany: boolean) => {
   if (!ctx.session || !ctx.session.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -70,6 +57,16 @@ const getUser = async (ctx: TRPCContext, withCompany: boolean) => {
 
   return user;
 };
+
+const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
+  const user = await getUser(ctx, true);
+
+  return next({
+    ctx: {
+      session: { ...ctx.session, user: user },
+    },
+  });
+});
 
 const enforceUserIsProvider = t.middleware(async ({ ctx, next }) => {
   const user = await getUser(ctx, true);
@@ -102,8 +99,24 @@ const enforceUserProviderAdmin = t.middleware(async ({ ctx, next }) => {
   });
 });
 
+const enforceUserIsAdmin = t.middleware(async ({ ctx, next }) => {
+  const user = await getUser(ctx, false);
+
+  if (!user || user.role !== "ADMIN") {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  return next({
+    ctx: {
+      session: {
+        ...ctx.session,
+        user: user,
+      },
+    },
+  });
+});
+
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
-export const providerProcedure = protectedProcedure.use(enforceUserIsProvider);
-export const adminProviderProcedure = protectedProcedure.use(
-  enforceUserProviderAdmin
-);
+export const providerProcedure = t.procedure.use(enforceUserIsProvider);
+export const adminProviderProcedure = t.procedure.use(enforceUserProviderAdmin);
+export const adminProcedure = t.procedure.use(enforceUserIsAdmin);
